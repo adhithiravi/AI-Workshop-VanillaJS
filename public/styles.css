@@ -1,0 +1,238 @@
+:root {
+  --accent: #b84d3b;
+  --bg: #fff;
+  --muted: #666
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  line-height: 1.4;
+  color: #222;
+  margin: 0;
+  background: linear-gradient(180deg, #fff8f6, #fff)
+}
+
+.header {
+  background: var(--accent);
+  color: #fff;
+  padding: 1.25rem;
+  text-align: center
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.brand {
+  text-align: left
+}
+
+.top-nav a {
+  color: #fff;
+  margin-left: 1rem;
+  text-decoration: none
+}
+
+.top-nav {
+  display: flex;
+  align-items: center
+}
+
+.btn-primary {
+  background: #E6B17E;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #2C1810;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #2C1810
+}
+
+.container {
+  max-width: 980px;
+  margin: 2rem auto;
+  padding: 0 1rem
+}
+
+.pies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem
+}
+
+.pie-card {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03)
+}
+
+.pie-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: .5rem
+}
+
+.hero {
+  position: relative;
+  margin-bottom: 1.5rem
+}
+
+.hero-slides {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  border-radius: 8px
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
+  display: flex;
+  align-items: center
+}
+
+.hero-slide.active {
+  opacity: 1
+}
+
+.hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover
+}
+
+.hero-content {
+  position: absolute;
+  left: 2rem;
+  z-index: 10;
+  color: #fff
+}
+
+.hero-indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: .5rem
+}
+
+.hero-indicators button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #888;
+  border: none
+}
+
+.hero-indicators button.active {
+  background: #fff
+}
+
+.featured {
+  margin-bottom: 1.5rem
+}
+
+.cart {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  z-index: 200
+}
+
+.cart.hidden {
+  display: none
+}
+
+.cart-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #eee
+}
+
+.cart-row-left {
+  max-width: 60%
+}
+
+.cart-row-right {
+  text-align: right
+}
+
+.cart-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center
+}
+
+.cart-preview button {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: .4rem .6rem;
+  border-radius: 6px
+}
+
+.pie-card h3 {
+  margin: 0 0 .5rem
+}
+
+.pie-card p {
+  margin: 0 0 1rem;
+  color: var(--muted)
+}
+
+.pie-card .price {
+  font-weight: 600;
+  margin-bottom: .5rem
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+  font-size: .9rem
+}
+
+#controls {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem
+}
+
+#controls input {
+  flex: 1;
+  padding: .5rem;
+  border-radius: 6px;
+  border: 1px solid #ddd
+}
+
+#controls select {
+  padding: .5rem;
+  border-radius: 6px;
+  border: 1px solid #ddd
+}

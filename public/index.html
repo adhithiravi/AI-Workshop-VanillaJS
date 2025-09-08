@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bethany's Pie Shop - Vanilla</title>
+  <!-- jQuery + Kendo UI CSS from CDN (optional) -->
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2024.3.1010/styles/kendo.default-v2.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Bethany's Pie Shop</h1>
+        <p id="tagline">Handmade pies, served with love.</p>
+      </div>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/cart.html">Cart</a>
+      </nav>
+      <div id="cart-preview" class="cart-preview">
+        <button id="cart-toggle">Cart (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="hero" class="hero">
+      <div class="hero-slides">
+        <div class="hero-slide active" data-index="0">
+          <img src="/images/Hero/hero1.jpg" alt="Welcome" />
+          <div class="hero-content">
+            <h2>Welcome to Bethany's Cafe</h2>
+            <p>Handcrafted pies made with love.</p>
+            <a class="btn-primary" href="#pies">Shop Now</a>
+          </div>
+        </div>
+        <div class="hero-slide" data-index="1">
+          <img src="/images/Hero/hero2.jpg" alt="Pumpkin Pie" />
+          <div class="hero-content">
+            <h2>Pumpkin Pie</h2>
+            <p>Perfect for any holiday gathering</p>
+            <a class="btn-primary" href="#pies">View Seasonal</a>
+          </div>
+        </div>
+        <div class="hero-slide" data-index="2">
+          <img src="/images/Hero/hero3.jpg" alt="Chocolate Pecan" />
+          <div class="hero-content">
+            <h2>Chocolate Pecan Pie</h2>
+            <p>A delicious twist on a classic favorite</p>
+            <a class="btn-primary" href="#pies">Browse Menu</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-indicators" id="hero-indicators"></div>
+    </section>
+
+    <section id="controls">
+      <input id="search" placeholder="Search pies..." />
+      <select id="categoryFilter">
+        <option value="">All</option>
+        <option value="Fruit">Fruit</option>
+        <option value="Cheesecake">Cheesecake</option>
+        <option value="Seasonal">Seasonal</option>
+      </select>
+    </section>
+
+    <section id="featured" class="featured">
+      <h2>Pies of the Month</h2>
+      <div id="monthly" class="pies-grid"></div>
+    </section>
+
+    <section id="pies" class="pies-grid">
+      <!-- pies will be injected here -->
+    </section>
+
+    <aside id="cart" class="cart hidden">
+      <h3>Your Cart</h3>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div>Total: $<span id="cart-total">0.00</span></div>
+        <button id="cart-clear" class="btn-secondary">Clear</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">Static vanilla app example — Express API</footer>
+
+  <!-- jQuery + Kendo UI from CDN -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://kendo.cdn.telerik.com/2024.3.1010/js/kendo.all.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+
+</html>
