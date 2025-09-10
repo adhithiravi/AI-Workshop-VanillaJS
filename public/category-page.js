@@ -1,6 +1,23 @@
-// Vanilla JS frontend with carousel, pies grid, and cart stored in localStorage
+// Category page JavaScript - handles individual category pages with search functionality
 const apiBase = '/api';
 
+/**
+ * Gets the current category from the page URL
+ * @returns {string} Category name (fruit, cheesecake, or seasonal)
+ */
+function getCurrentCategory() {
+  const path = window.location.pathname;
+  if (path.includes('fruit')) return 'fruit';
+  if (path.includes('cheesecake')) return 'cheesecake';
+  if (path.includes('seasonal')) return 'seasonal';
+  return 'fruit'; // fallback
+}
+
+/**
+ * Fetches pies for the current category
+ * @param {string} category - Category to fetch
+ * @returns {Promise<Array>} Array of pie objects
+ */
 async function fetchPies(category) {
   const url = new URL(`${apiBase}/pies`, location.origin);
   if (category) url.searchParams.set('category', category);
@@ -9,12 +26,11 @@ async function fetchPies(category) {
   return res.json();
 }
 
-async function fetchMonthly() {
-  const res = await fetch(`${apiBase}/pies-of-the-month`);
-  if (!res.ok) throw new Error('Failed to fetch monthly pies');
-  return res.json();
-}
-
+/**
+ * Creates a pie card element
+ * @param {Object} pie - Pie object with id, name, price, description, image
+ * @returns {HTMLElement} Pie card element
+ */
 function createPieCard(pie) {
   const card = document.createElement('article');
   card.className = 'pie-card';
@@ -48,14 +64,12 @@ function createPieCard(pie) {
   return card;
 }
 
+/**
+ * Renders pies in the grid container
+ * @param {Array} pies - Array of pie objects to render
+ */
 function renderPies(pies) {
   const container = document.getElementById('pies');
-  container.innerHTML = '';
-  pies.forEach(pie => container.appendChild(createPieCard(pie)));
-}
-
-function renderMonthly(pies) {
-  const container = document.getElementById('monthly');
   container.innerHTML = '';
   pies.forEach(pie => container.appendChild(createPieCard(pie)));
 }
@@ -171,6 +185,7 @@ function updateCartUI() {
   attachRemoveButtonListeners();
 }
 
+// Search functionality
 /**
  * Safely gets search input value with fallback
  * @returns {string} Trimmed search query in lowercase
@@ -178,15 +193,6 @@ function updateCartUI() {
 function getSearchQuery() {
   const searchElement = document.getElementById('search');
   return searchElement?.value?.trim()?.toLowerCase() || '';
-}
-
-/**
- * Safely gets category filter value with fallback
- * @returns {string} Category value in lowercase
- */
-function getCategoryFilter() {
-  const categoryElement = document.getElementById('categoryFilter');
-  return categoryElement?.value?.trim()?.toLowerCase() || '';
 }
 
 /**
@@ -205,85 +211,56 @@ function matchesSearchQuery(pie, query) {
 }
 
 /**
- * Checks if a pie matches the category filter
- * @param {Object} pie - Pie object with category
- * @param {string} categoryFilter - Category filter in lowercase
- * @returns {boolean} True if pie matches category criteria
- */
-function matchesCategoryFilter(pie, categoryFilter) {
-  if (!categoryFilter) return true;
-
-  const pieCategory = pie.category?.toLowerCase() || '';
-  return pieCategory === categoryFilter;
-}
-
-/**
- * Applies search and category filters to pies array
+ * Applies search filter to pies array
  * @param {Array} pies - Array of pie objects to filter
  * @returns {Array} Filtered array of pies
  */
-function applyFilters(pies) {
+function applySearchFilter(pies) {
   // Validate input
   if (!Array.isArray(pies)) {
-    console.warn('applyFilters: Invalid pies array provided');
+    console.warn('applySearchFilter: Invalid pies array provided');
     return [];
   }
 
   const searchQuery = getSearchQuery();
-  const categoryFilter = getCategoryFilter();
-
-  return pies.filter(pie => {
-    const matchesSearch = matchesSearchQuery(pie, searchQuery);
-    const matchesCategory = matchesCategoryFilter(pie, categoryFilter);
-    return matchesSearch && matchesCategory;
-  });
+  return pies.filter(pie => matchesSearchQuery(pie, searchQuery));
 }
 
-// Hero carousel
-function initCarousel() {
-  const slides = Array.from(document.querySelectorAll('.hero-slide'));
-  const indicators = document.getElementById('hero-indicators');
-  slides.forEach((s, i) => {
-    const btn = document.createElement('button');
-    btn.className = i === 0 ? 'active' : '';
-    btn.dataset.index = i;
-    btn.addEventListener('click', () => setSlide(i));
-    indicators.appendChild(btn);
-  });
-
-  let idx = 0;
-  let timer = setInterval(() => setSlide((idx + 1) % slides.length), 5000);
-
-  function setSlide(i) {
-    slides.forEach(s => s.classList.remove('active'));
-    slides[i].classList.add('active');
-    indicators.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    indicators.querySelector(`button[data-index='${i}']`).classList.add('active');
-    idx = i;
-    clearInterval(timer);
-    timer = setInterval(() => setSlide((idx + 1) % slides.length), 5000);
-  }
-}
-
+// Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    initCarousel();
+    const category = getCurrentCategory();
     updateCartUI();
 
-    // Load only monthly pies for home page
-    const monthly = await fetchMonthly();
-    renderMonthly(monthly);
+    // Fetch and render pies for this category
+    const pies = await fetchPies(category);
+    renderPies(pies);
 
-    // cart toggle
+    // Set up search functionality
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const filteredPies = applySearchFilter(pies);
+        renderPies(filteredPies);
+      });
+    }
+
+    // Cart functionality
     document.getElementById('cart-toggle')?.addEventListener('click', () => {
       document.getElementById('cart')?.classList.toggle('hidden');
     });
+
     document.getElementById('cart-clear')?.addEventListener('click', clearCart);
+
+    // Optional: initialize Kendo widgets if available
+    if (window.kendo && window.$) {
+      $('#search').kendoTextBox?.();
+    }
   } catch (err) {
-    console.error('Failed to load home page:', err);
-    const container = document.getElementById('monthly');
+    console.error('Failed to load category page:', err);
+    const container = document.getElementById('pies');
     if (container) {
-      container.textContent = 'Failed to load pies of the month.';
+      container.textContent = 'Failed to load pies. Please try again later.';
     }
   }
 });

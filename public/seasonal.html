@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Seasonal Pies - Bethany's Pie Shop</title>
+  <!-- jQuery + Kendo UI CSS from CDN (optional) -->
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2024.3.1010/styles/kendo.default-v2.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1><a href="/">Bethany's Pie Shop</a></h1>
+        <p id="tagline">Handmade pies, served with love.</p>
+      </div>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/fruit.html">Fruit Pies</a>
+        <a href="/cheesecake.html">Cheesecakes</a>
+        <a href="/seasonal.html" class="active">Seasonal</a>
+        <a href="/cart.html">Cart</a>
+      </nav>
+      <div id="cart-preview" class="cart-preview">
+        <button id="cart-toggle">Cart (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Seasonal Pies</h1>
+      <p>Holiday favorites and seasonal specialties</p>
+    </section>
+
+    <section id="controls">
+      <input id="search" placeholder="Search seasonal pies..." />
+    </section>
+
+    <section id="pies" class="pies-grid">
+      <!-- pies will be injected here -->
+    </section>
+
+    <aside id="cart" class="cart hidden">
+      <h3>Your Cart</h3>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div>Total: $<span id="cart-total">0.00</span></div>
+        <button id="cart-clear" class="btn-secondary">Clear</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">Static vanilla app example — Express API</footer>
+
+  <!-- jQuery + Kendo UI from CDN -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://kendo.cdn.telerik.com/2024.3.1010/js/kendo.all.min.js"></script>
+  <script src="/cartStorage.js"></script>
+  <script src="/category-page.js"></script>
+</body>
+
+</html>
