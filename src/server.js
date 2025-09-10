@@ -8,6 +8,7 @@ const express = require('express');
 const securityMiddleware = require('./middleware/security');
 const apiRoutes = require('./routes/api');
 const { PORT } = require('./config/constants');
+const { swaggerUi, swaggerDocument, swaggerOptions } = require('./config/swagger');
 
 const app = express();
 
@@ -19,6 +20,14 @@ app.use(express.json());
 
 // API routes
 app.use('/api', apiRoutes);
+
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
+
+// Redirect root to API documentation
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
 
 // Serve static frontend
 const publicDir = path.join(__dirname, '..', 'public');
@@ -32,4 +41,5 @@ app.get('*', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Bethany's vanilla app listening at http://localhost:${PORT}`);
+  console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
 });
