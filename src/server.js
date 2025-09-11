@@ -24,11 +24,6 @@ app.use('/api', apiRoutes);
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
-// Redirect root to API documentation
-app.get('/', (req, res) => {
-  res.redirect('/api-docs');
-});
-
 // Serve static frontend
 const publicDir = path.join(__dirname, '..', 'public');
 app.use(express.static(publicDir));

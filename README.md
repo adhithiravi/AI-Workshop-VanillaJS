@@ -33,7 +33,6 @@ AI-Workshop-VanillaJS/
 ### Interactive Documentation
 - **Swagger UI**: http://localhost:4000/api-docs (integrated with Express)
 - **OpenAPI Spec**: http://localhost:4000/swagger.yaml
-- **Root Redirect**: http://localhost:4000/ → redirects to API docs
 
 ### API Endpoints
 - `GET /api/pies` - Get all pies (with optional category filter)
