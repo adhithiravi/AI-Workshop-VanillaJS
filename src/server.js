@@ -34,7 +34,12 @@ app.get('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Bethany's vanilla app listening at http://localhost:${PORT}`);
-  console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Bethany's vanilla app listening at http://localhost:${PORT}`);
+    console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
+  });
+}
+
+// Export app for testing
+module.exports = app;
