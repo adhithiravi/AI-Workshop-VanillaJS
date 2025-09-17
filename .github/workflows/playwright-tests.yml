@@ -1,0 +1,71 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        test-type: [smoke, homepage]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+
+    - name: Start server
+      run: |
+        npm run start &
+        sleep 10
+      env:
+        NODE_ENV: test
+
+    - name: Wait for server to be ready
+      run: |
+        timeout 30 bash -c 'until curl -f http://localhost:4000/; do sleep 1; done'
+
+    - name: Run Smoke Tests
+      if: matrix.test-type == 'smoke'
+      run: npx playwright test e2e/smoke.spec.js --reporter=html
+      env:
+        CI: true
+
+    - name: Run Homepage Tests
+      if: matrix.test-type == 'homepage'
+      run: npx playwright test e2e/homepage.spec.js --reporter=html
+      env:
+        CI: true
+
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.test-type }}
+        path: playwright-report/
+        retention-days: 30
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.test-type }}
+        path: test-results/
+        retention-days: 30
