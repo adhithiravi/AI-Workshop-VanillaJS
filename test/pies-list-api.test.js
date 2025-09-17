@@ -7,6 +7,8 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('node:http');
 const app = require('../src/server');
+const pies = require('../src/data/pies');
+const { ALLOWED_CATEGORIES } = require('../src/config/constants');
 
 describe('GET /api/pies', () => {
   let server;
@@ -39,15 +41,16 @@ describe('GET /api/pies', () => {
     assert.strictEqual(response.statusCode, 200);
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 12); // Total pies in data
+    const returnedPies = JSON.parse(response.body);
+    assert(Array.isArray(returnedPies));
+    assert.strictEqual(returnedPies.length, pies.length); // Total pies in data
 
     // Verify all expected pies are present
-    const pieIds = pies.map(pie => pie.id);
-    assert(pieIds.includes('s1')); // seasonal
-    assert(pieIds.includes('f1')); // fruit
-    assert(pieIds.includes('c1')); // cheesecake
+    const returnedPieIds = returnedPies.map(pie => pie.id);
+    const expectedPieIds = pies.map(pie => pie.id);
+    expectedPieIds.forEach(expectedId => {
+      assert(returnedPieIds.includes(expectedId), `Should include pie with id: ${expectedId}`);
+    });
   });
 
   test('should return 200 and all pies when category=all', async () => {
@@ -56,64 +59,41 @@ describe('GET /api/pies', () => {
     assert.strictEqual(response.statusCode, 200);
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 12); // Total pies in data
+    const returnedPies = JSON.parse(response.body);
+    assert(Array.isArray(returnedPies));
+    assert.strictEqual(returnedPies.length, pies.length); // Total pies in data
   });
 
-  test('should return 200 and only fruit pies when category=fruit', async () => {
-    const response = await makeRequest('/api/pies?category=fruit');
+  // Test each category dynamically
+  for (const category of ALLOWED_CATEGORIES) {
+    if (category === 'all') continue; // Skip 'all' as it's tested separately
 
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
+    test(`should return 200 and only ${category} pies when category=${category}`, async () => {
+      const response = await makeRequest(`/api/pies?category=${category}`);
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 3); // 3 fruit pies
+      assert.strictEqual(response.statusCode, 200);
+      assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    // Verify all returned pies are fruit category
-    pies.forEach(pie => {
-      assert.strictEqual(pie.category, 'fruit');
+      const returnedPies = JSON.parse(response.body);
+      assert(Array.isArray(returnedPies));
+
+      // Calculate expected count for this category
+      const expectedPies = pies.filter(pie => pie.category === category);
+      assert.strictEqual(returnedPies.length, expectedPies.length);
+
+      // Verify all returned pies are of the correct category
+      returnedPies.forEach(pie => {
+        assert.strictEqual(pie.category, category);
+      });
+
+      // Verify all expected pies are present
+      const returnedPieIds = returnedPies.map(pie => pie.id);
+      const expectedPieIds = expectedPies.map(pie => pie.id);
+      expectedPieIds.forEach(expectedId => {
+        assert(returnedPieIds.includes(expectedId), `Should include ${category} pie with id: ${expectedId}`);
+      });
     });
-
-    // Verify specific fruit pies
-    const pieIds = pies.map(pie => pie.id);
-    assert(pieIds.includes('f1'));
-    assert(pieIds.includes('f2'));
-    assert(pieIds.includes('f3'));
-  });
-
-  test('should return 200 and only cheesecake pies when category=cheesecake', async () => {
-    const response = await makeRequest('/api/pies?category=cheesecake');
-
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
-
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 6); // 6 cheesecake pies
-
-    // Verify all returned pies are cheesecake category
-    pies.forEach(pie => {
-      assert.strictEqual(pie.category, 'cheesecake');
-    });
-  });
-
-  test('should return 200 and only seasonal pies when category=seasonal', async () => {
-    const response = await makeRequest('/api/pies?category=seasonal');
-
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
-
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 3); // 3 seasonal pies
-
-    // Verify all returned pies are seasonal category
-    pies.forEach(pie => {
-      assert.strictEqual(pie.category, 'seasonal');
-    });
-  });
+  }
 
   test('should return 400 for non-existent category', async () => {
     const response = await makeRequest('/api/pies?category=nonexistent');
@@ -123,7 +103,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should return 400 for invalid category', async () => {
@@ -134,7 +114,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should handle case sensitivity for category parameter', async () => {
@@ -165,9 +145,9 @@ describe('GET /api/pies', () => {
     assert.strictEqual(response.statusCode, 200);
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 12); // All pies when category is empty
+    const returnedPies = JSON.parse(response.body);
+    assert(Array.isArray(returnedPies));
+    assert.strictEqual(returnedPies.length, pies.length); // All pies when category is empty
   });
 
   test('should handle multiple category parameters (returns 400 for invalid)', async () => {
@@ -178,7 +158,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should handle special characters in category parameter', async () => {
@@ -189,7 +169,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should handle numeric category parameter', async () => {
@@ -200,7 +180,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should handle very long category parameter', async () => {
@@ -212,7 +192,7 @@ describe('GET /api/pies', () => {
 
     const error = JSON.parse(response.body);
     assert.strictEqual(error.error, true);
-    assert.strictEqual(error.message, 'Invalid category. Must be one of: seasonal, fruit, cheesecake, all');
+    assert.strictEqual(error.message, `Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(', ')}`);
   });
 
   test('should verify pie data structure integrity', async () => {

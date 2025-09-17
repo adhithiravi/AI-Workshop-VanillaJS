@@ -7,6 +7,7 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('node:http');
 const app = require('../src/server');
+const pies = require('../src/data/pies');
 
 describe('GET /api/pies/:id', () => {
   let server;
@@ -33,45 +34,23 @@ describe('GET /api/pies/:id', () => {
     });
   });
 
-  test('should return 200 and pie data for valid id (f1)', async () => {
-    const response = await makeRequest('/api/pies/f1');
+  // Test all valid pie IDs dynamically
+  for (const pie of pies) {
+    test(`should return 200 and pie data for valid id (${pie.id})`, async () => {
+      const response = await makeRequest(`/api/pies/${pie.id}`);
 
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
+      assert.strictEqual(response.statusCode, 200);
+      assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pie = JSON.parse(response.body);
-    assert.strictEqual(pie.id, 'f1');
-    assert.strictEqual(pie.name, 'Classic Apple Pie');
-    assert.strictEqual(pie.price, 12.95);
-    assert.strictEqual(pie.category, 'fruit');
-    assert.strictEqual(pie.description, 'Made with fresh apples and a flaky crust');
-    assert.strictEqual(pie.image, '/images/Fruit/fruit1.png');
-  });
-
-  test('should return 200 and pie data for another valid id (c1)', async () => {
-    const response = await makeRequest('/api/pies/c1');
-
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
-
-    const pie = JSON.parse(response.body);
-    assert.strictEqual(pie.id, 'c1');
-    assert.strictEqual(pie.name, 'Classic New York Cheesecake');
-    assert.strictEqual(pie.price, 16.95);
-    assert.strictEqual(pie.category, 'cheesecake');
-  });
-
-  test('should return 200 and pie data for seasonal id (s1)', async () => {
-    const response = await makeRequest('/api/pies/s1');
-
-    assert.strictEqual(response.statusCode, 200);
-    assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
-
-    const pie = JSON.parse(response.body);
-    assert.strictEqual(pie.id, 's1');
-    assert.strictEqual(pie.name, 'Pumpkin Pie');
-    assert.strictEqual(pie.category, 'seasonal');
-  });
+      const returnedPie = JSON.parse(response.body);
+      assert.strictEqual(returnedPie.id, pie.id);
+      assert.strictEqual(returnedPie.name, pie.name);
+      assert.strictEqual(returnedPie.price, pie.price);
+      assert.strictEqual(returnedPie.category, pie.category);
+      assert.strictEqual(returnedPie.description, pie.description);
+      assert.strictEqual(returnedPie.image, pie.image);
+    });
+  }
 
   test('should return 404 for non-existent id', async () => {
     const response = await makeRequest('/api/pies/nonexistent');

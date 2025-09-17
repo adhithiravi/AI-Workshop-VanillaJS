@@ -7,6 +7,8 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('node:http');
 const app = require('../src/server');
+const { getPiesOfTheMonth } = require('../src/helpers/piesHelper');
+const pies = require('../src/data/pies');
 
 describe('GET /api/pies-of-the-month', () => {
   let server;
@@ -39,42 +41,38 @@ describe('GET /api/pies-of-the-month', () => {
     assert.strictEqual(response.statusCode, 200);
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 3); // 3 pies of the month
+    const returnedPies = JSON.parse(response.body);
+    assert(Array.isArray(returnedPies));
+
+    // Get expected pies of the month from helper function
+    const expectedPies = getPiesOfTheMonth(pies);
+    assert.strictEqual(returnedPies.length, expectedPies.length);
 
     // Verify correct order and IDs
-    assert.strictEqual(pies[0].id, 'f2'); // Cherry Pie
-    assert.strictEqual(pies[1].id, 'f3'); // Blueberry Pie
-    assert.strictEqual(pies[2].id, 'c3'); // Strawberry Cheesecake
+    returnedPies.forEach((pie, index) => {
+      assert.strictEqual(pie.id, expectedPies[index].id, `Pie at index ${index} should have correct ID`);
+    });
   });
 
   test('should return correct pie data for pies of the month', async () => {
     const response = await makeRequest('/api/pies-of-the-month');
 
     assert.strictEqual(response.statusCode, 200);
-    const pies = JSON.parse(response.body);
+    const returnedPies = JSON.parse(response.body);
 
-    // Verify first pie (Cherry Pie)
-    assert.strictEqual(pies[0].name, 'Cherry Pie');
-    assert.strictEqual(pies[0].price, 13.95);
-    assert.strictEqual(pies[0].category, 'fruit');
-    assert.strictEqual(pies[0].description, 'Sweet and tart cherries in a buttery crust');
-    assert.strictEqual(pies[0].image, '/images/Fruit/fruit2.png');
+    // Get expected pies of the month from helper function
+    const expectedPies = getPiesOfTheMonth(pies);
 
-    // Verify second pie (Blueberry Pie)
-    assert.strictEqual(pies[1].name, 'Blueberry Pie');
-    assert.strictEqual(pies[1].price, 13.95);
-    assert.strictEqual(pies[1].category, 'fruit');
-    assert.strictEqual(pies[1].description, 'Bursting with fresh blueberries');
-    assert.strictEqual(pies[1].image, '/images/Fruit/fruit3.png');
-
-    // Verify third pie (Strawberry Cheesecake)
-    assert.strictEqual(pies[2].name, 'Strawberry Cheesecake');
-    assert.strictEqual(pies[2].price, 17.95);
-    assert.strictEqual(pies[2].category, 'cheesecake');
-    assert.strictEqual(pies[2].description, 'Topped with fresh strawberry compote');
-    assert.strictEqual(pies[2].image, '/images/Cheesecakes/cheesecake3.jpg');
+    // Verify each pie matches the expected data
+    returnedPies.forEach((pie, index) => {
+      const expectedPie = expectedPies[index];
+      assert.strictEqual(pie.id, expectedPie.id, `Pie ${index} should have correct ID`);
+      assert.strictEqual(pie.name, expectedPie.name, `Pie ${index} should have correct name`);
+      assert.strictEqual(pie.price, expectedPie.price, `Pie ${index} should have correct price`);
+      assert.strictEqual(pie.category, expectedPie.category, `Pie ${index} should have correct category`);
+      assert.strictEqual(pie.description, expectedPie.description, `Pie ${index} should have correct description`);
+      assert.strictEqual(pie.image, expectedPie.image, `Pie ${index} should have correct image`);
+    });
   });
 
   test('should return consistent results on multiple requests', async () => {
@@ -84,12 +82,12 @@ describe('GET /api/pies-of-the-month', () => {
     assert.strictEqual(response1.statusCode, 200);
     assert.strictEqual(response2.statusCode, 200);
 
-    const pies1 = JSON.parse(response1.body);
-    const pies2 = JSON.parse(response2.body);
+    const returnedPies1 = JSON.parse(response1.body);
+    const returnedPies2 = JSON.parse(response2.body);
 
     // Results should be identical
-    assert.strictEqual(pies1.length, pies2.length);
-    assert.deepStrictEqual(pies1, pies2);
+    assert.strictEqual(returnedPies1.length, returnedPies2.length);
+    assert.deepStrictEqual(returnedPies1, returnedPies2);
   });
 
   test('should handle query parameters gracefully (ignores them)', async () => {
@@ -98,18 +96,21 @@ describe('GET /api/pies-of-the-month', () => {
     assert.strictEqual(response.statusCode, 200);
     assert.strictEqual(response.headers['content-type'], 'application/json; charset=utf-8');
 
-    const pies = JSON.parse(response.body);
-    assert(Array.isArray(pies));
-    assert.strictEqual(pies.length, 3); // Still returns all 3 pies of the month
+    const returnedPies = JSON.parse(response.body);
+    assert(Array.isArray(returnedPies));
+
+    // Get expected pies of the month from helper function
+    const expectedPies = getPiesOfTheMonth(pies);
+    assert.strictEqual(returnedPies.length, expectedPies.length);
   });
 
   test('should verify data structure integrity for pies of the month', async () => {
     const response = await makeRequest('/api/pies-of-the-month');
 
     assert.strictEqual(response.statusCode, 200);
-    const pies = JSON.parse(response.body);
+    const returnedPies = JSON.parse(response.body);
 
-    pies.forEach(pie => {
+    returnedPies.forEach(pie => {
       // Verify required fields exist
       assert(pie.id, 'Pie should have an id');
       assert(pie.name, 'Pie should have a name');

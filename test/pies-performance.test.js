@@ -7,6 +7,7 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('node:http');
 const app = require('../src/server');
+const pies = require('../src/data/pies');
 
 describe('GET /api/pies/:id Performance', () => {
   let server;
@@ -33,12 +34,14 @@ describe('GET /api/pies/:id Performance', () => {
     });
   });
 
-  test('should have p95 latency under 30ms for 30 requests to /api/pies/f1', async () => {
+  test('should have p95 latency under 30ms for 30 requests to /api/pies/:id', async () => {
     const numRequests = 30;
-    const targetPieId = 'f1';
+    // Use the first pie from the data as the target
+    const targetPie = pies[0];
+    const targetPieId = targetPie.id;
     const maxP95Latency = 30; // milliseconds
 
-    console.log(`Making ${numRequests} requests to /api/pies/${targetPieId}...`);
+    console.log(`Making ${numRequests} requests to /api/pies/${targetPieId} (${targetPie.name})...`);
 
     // Array to store response times
     const responseTimes = [];
@@ -61,6 +64,7 @@ describe('GET /api/pies/:id Performance', () => {
 
         const pie = JSON.parse(response.body);
         assert.strictEqual(pie.id, targetPieId, `Request ${index + 1} should return correct pie`);
+        assert.strictEqual(pie.name, targetPie.name, `Request ${index + 1} should return correct pie name`);
 
         return responseTimeMs;
       } catch (error) {
@@ -115,9 +119,11 @@ describe('GET /api/pies/:id Performance', () => {
 
   test('should handle concurrent requests without errors', async () => {
     const numRequests = 10;
-    const targetPieId = 'f1';
+    // Use a different pie from the data for variety
+    const targetPie = pies[1] || pies[0]; // Use second pie if available, otherwise first
+    const targetPieId = targetPie.id;
 
-    console.log(`Making ${numRequests} concurrent requests to verify stability...`);
+    console.log(`Making ${numRequests} concurrent requests to /api/pies/${targetPieId} (${targetPie.name}) to verify stability...`);
 
     const requests = Array.from({ length: numRequests }, async (_, index) => {
       const response = await makeRequest(`/api/pies/${targetPieId}`);
@@ -127,6 +133,7 @@ describe('GET /api/pies/:id Performance', () => {
 
       const pie = JSON.parse(response.body);
       assert.strictEqual(pie.id, targetPieId, `Concurrent request ${index + 1} should return correct pie`);
+      assert.strictEqual(pie.name, targetPie.name, `Concurrent request ${index + 1} should return correct pie name`);
 
       return response;
     });
