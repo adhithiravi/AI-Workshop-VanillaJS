@@ -27,8 +27,15 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
+    - name: Test server startup
+      run: |
+        echo "Testing server startup..."
+        timeout 30 bash -c 'until curl -f http://localhost:4000/; do sleep 1; done' || echo "Server not ready, but continuing with tests..."
+
     - name: Run Playwright smoke tests
-      run: npx playwright test e2e/smoke.spec.js --reporter=html
+      run: |
+        echo "Starting Playwright smoke tests..."
+        npx playwright test e2e/smoke.spec.js --reporter=html --verbose
       env:
         CI: true
 
