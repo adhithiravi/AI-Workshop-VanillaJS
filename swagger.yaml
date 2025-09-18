@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: Bethany's Pie Shop API
+  description: |
+    A RESTful API for Bethany's Pie Shop, providing endpoints to browse and manage pie inventory.
+    This API supports category filtering, search functionality, and cart management.
+  version: 1.0.0
+  contact:
+    name: Bethany's Pie Shop
+    email: info@bethanyspieshop.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Development server
+  - url: https://api.bethanyspieshop.com
+    description: Production server
+
+paths:
+  /api/pies:
+    get:
+      summary: Get all pies or filter by category
+      description: |
+        Retrieves a list of all available pies. Optionally filter by category.
+        Supports categories: seasonal, fruit, cheesecake, all.
+      tags:
+        - Pies
+      parameters:
+        - name: category
+          in: query
+          description: Filter pies by category
+          required: false
+          schema:
+            type: string
+            enum: [seasonal, fruit, cheesecake, all]
+          example: fruit
+      responses:
+        '200':
+          description: Successful response with list of pies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pie'
+              examples:
+                all_pies:
+                  summary: All pies
+                  value:
+                    - id: "s1"
+                      name: "Pumpkin Pie"
+                      price: 14.95
+                      description: "Perfect for any holiday gathering"
+                      category: "seasonal"
+                      image: "/images/Seasonal/pie-1.png"
+                    - id: "f1"
+                      name: "Classic Apple Pie"
+                      price: 12.95
+                      description: "Made with fresh apples and a flaky crust"
+                      category: "fruit"
+                      image: "/images/Fruit/fruit1.png"
+                fruit_pies:
+                  summary: Fruit pies only
+                  value:
+                    - id: "f1"
+                      name: "Classic Apple Pie"
+                      price: 12.95
+                      description: "Made with fresh apples and a flaky crust"
+                      category: "fruit"
+                      image: "/images/Fruit/fruit1.png"
+                    - id: "f2"
+                      name: "Cherry Pie"
+                      price: 13.95
+                      description: "Sweet and tart cherries in a buttery crust"
+                      category: "fruit"
+                      image: "/images/Fruit/fruit2.png"
+        '400':
+          description: Invalid category parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_category:
+                  summary: Invalid category
+                  value:
+                    error: true
+                    message: "Invalid category. Must be one of: seasonal, fruit, cheesecake, all"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                server_error:
+                  summary: Server error
+                  value:
+                    error: true
+                    message: "Failed to fetch pies"
+
+  /api/pies-of-the-month:
+    get:
+      summary: Get pies of the month
+      description: |
+        Retrieves a curated selection of featured pies for the current month.
+        This is a subset of the main pies collection.
+      tags:
+        - Pies
+      responses:
+        '200':
+          description: Successful response with monthly pies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pie'
+              examples:
+                monthly_pies:
+                  summary: Monthly featured pies
+                  value:
+                    - id: "f2"
+                      name: "Cherry Pie"
+                      price: 13.95
+                      description: "Sweet and tart cherries in a buttery crust"
+                      category: "fruit"
+                      image: "/images/Fruit/fruit2.png"
+                    - id: "f3"
+                      name: "Blueberry Pie"
+                      price: 13.95
+                      description: "Bursting with fresh blueberries"
+                      category: "fruit"
+                      image: "/images/Fruit/fruit3.png"
+                    - id: "c3"
+                      name: "Strawberry Cheesecake"
+                      price: 17.95
+                      description: "Topped with fresh strawberry compote"
+                      category: "cheesecake"
+                      image: "/images/Cheesecakes/cheesecake3.jpg"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                server_error:
+                  summary: Server error
+                  value:
+                    error: true
+                    message: "Failed to fetch pies of the month"
+
+  /api/pies/{id}:
+    get:
+      summary: Get pie by ID
+      description: |
+        Retrieves a specific pie by its unique identifier.
+      tags:
+        - Pies
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the pie
+          required: true
+          schema:
+            type: string
+          examples:
+            seasonal_pie:
+              value: "s1"
+              summary: Seasonal pie ID
+            fruit_pie:
+              value: "f2"
+              summary: Fruit pie ID
+            cheesecake_pie:
+              value: "c3"
+              summary: Cheesecake pie ID
+      responses:
+        '200':
+          description: Successful response with pie details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pie'
+              examples:
+                seasonal_pie:
+                  summary: Seasonal pie
+                  value:
+                    id: "s1"
+                    name: "Pumpkin Pie"
+                    price: 14.95
+                    description: "Perfect for any holiday gathering"
+                    category: "seasonal"
+                    image: "/images/Seasonal/pie-1.png"
+                fruit_pie:
+                  summary: Fruit pie
+                  value:
+                    id: "f2"
+                    name: "Cherry Pie"
+                    price: 13.95
+                    description: "Sweet and tart cherries in a buttery crust"
+                    category: "fruit"
+                    image: "/images/Fruit/fruit2.png"
+                cheesecake_pie:
+                  summary: Cheesecake pie
+                  value:
+                    id: "c3"
+                    name: "Strawberry Cheesecake"
+                    price: 17.95
+                    description: "Topped with fresh strawberry compote"
+                    category: "cheesecake"
+                    image: "/images/Cheesecakes/cheesecake3.jpg"
+        '404':
+          description: Pie not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                pie_not_found:
+                  summary: Pie not found
+                  value:
+                    error: true
+                    message: "Pie not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                server_error:
+                  summary: Server error
+                  value:
+                    error: true
+                    message: "Failed to fetch pie"
+
+components:
+  schemas:
+    Pie:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - category
+        - image
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the pie
+          example: "f1"
+        name:
+          type: string
+          description: Display name of the pie
+          example: "Classic Apple Pie"
+        price:
+          type: number
+          format: decimal
+          description: Price in USD
+          example: 12.95
+        description:
+          type: string
+          description: Detailed description of the pie
+          example: "Made with fresh apples and a flaky crust"
+        category:
+          type: string
+          enum: [seasonal, fruit, cheesecake]
+          description: Category classification of the pie
+          example: "fruit"
+        image:
+          type: string
+          format: uri
+          description: URL path to the pie image
+          example: "/images/Fruit/fruit1.png"
+      example:
+        id: "f1"
+        name: "Classic Apple Pie"
+        price: 12.95
+        description: "Made with fresh apples and a flaky crust"
+        category: "fruit"
+        image: "/images/Fruit/fruit1.png"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: boolean
+          description: Indicates if this is an error response
+          example: true
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid category. Must be one of: seasonal, fruit, cheesecake, all"
+      example:
+        error: true
+        message: "Invalid category. Must be one of: seasonal, fruit, cheesecake, all"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (if implemented)
+
+tags:
+  - name: Pies
+    description: Operations related to pie inventory and management
+
+externalDocs:
+  description: Find out more about Bethany's Pie Shop
+  url: https://bethanyspieshop.com

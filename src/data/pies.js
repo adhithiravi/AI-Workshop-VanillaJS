@@ -1,9 +1,7 @@
-const path = require('path');
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 4000;
-
-app.use(express.json());
+/**
+ * Pies Data Module
+ * Contains the in-memory pies data
+ */
 
 // Expanded in-memory pies data (ids match the course repo patterns)
 const pies = [
@@ -26,51 +24,4 @@ const pies = [
   { id: 'c6', name: 'Peach Cheesecake', price: 18.95, description: 'A creamy peach cheesecake with a graham cracker crust', category: 'cheesecake', image: '/images/Cheesecakes/cheesecake6.jpg' }
 ];
 
-// API: list pies with optional category filter
-app.get('/api/pies', async (req, res) => {
-  try {
-    const category = (req.query.category || '').toString().toLowerCase();
-    let filtered = pies;
-    if (category) {
-      filtered = pies.filter(p => p.category === category);
-    }
-
-    // simulate small latency like the original repo
-    await new Promise(r => setTimeout(r, 400));
-    res.json(filtered);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch pies' });
-  }
-});
-
-// API: pies of the month (subset)
-app.get('/api/pies-of-the-month', async (req, res) => {
-  try {
-    const monthly = [pies.find(p => p.id === 'f2'), pies.find(p => p.id === 'f3'), pies.find(p => p.id === 'c3')].filter(Boolean);
-    await new Promise(r => setTimeout(r, 300));
-    res.json(monthly);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch pies of the month' });
-  }
-});
-
-// API: get pie by id
-app.get('/api/pies/:id', (req, res) => {
-  const id = req.params.id;
-  const pie = pies.find(p => p.id === id);
-  if (!pie) return res.status(404).json({ error: 'Pie not found' });
-  res.json(pie);
-});
-
-// Serve static frontend
-const publicDir = path.join(__dirname, 'public');
-app.use(express.static(publicDir));
-
-// Fallback to index.html for SPA
-app.get('*', (req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
-});
-
-app.listen(port, () => {
-  console.log(`Bethany's vanilla app listening at http://localhost:${port}`);
-});
+module.exports = pies;

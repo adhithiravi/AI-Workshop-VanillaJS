@@ -34,7 +34,17 @@ body {
 .top-nav a {
   color: #fff;
   margin-left: 1rem;
-  text-decoration: none
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.top-nav a:hover {
+  opacity: 0.8;
+}
+
+.top-nav a.active {
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 .top-nav {
@@ -235,4 +245,80 @@ body {
   padding: .5rem;
   border-radius: 6px;
   border: 1px solid #ddd
+}
+
+/* Page header styles */
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.page-header h1 {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+/* Category links for home page */
+.shop-cta {
+  text-align: center;
+  margin: 3rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.shop-cta h2 {
+  margin: 0 0 2rem;
+  color: var(--accent);
+}
+
+.category-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.category-link {
+  display: block;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.category-link h3 {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+}
+
+.category-link p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Brand link styling */
+.brand h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand h1 a:hover {
+  opacity: 0.9;
 }

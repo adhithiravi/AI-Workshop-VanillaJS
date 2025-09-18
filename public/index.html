@@ -19,6 +19,9 @@
       </div>
       <nav class="top-nav">
         <a href="/">Home</a>
+        <a href="/fruit.html">Fruit Pies</a>
+        <a href="/cheesecake.html">Cheesecakes</a>
+        <a href="/seasonal.html">Seasonal</a>
         <a href="/cart.html">Cart</a>
       </nav>
       <div id="cart-preview" class="cart-preview">
@@ -58,23 +61,27 @@
       <div class="hero-indicators" id="hero-indicators"></div>
     </section>
 
-    <section id="controls">
-      <input id="search" placeholder="Search pies..." />
-      <select id="categoryFilter">
-        <option value="">All</option>
-        <option value="Fruit">Fruit</option>
-        <option value="Cheesecake">Cheesecake</option>
-        <option value="Seasonal">Seasonal</option>
-      </select>
-    </section>
-
     <section id="featured" class="featured">
       <h2>Pies of the Month</h2>
       <div id="monthly" class="pies-grid"></div>
     </section>
 
-    <section id="pies" class="pies-grid">
-      <!-- pies will be injected here -->
+    <section class="shop-cta">
+      <h2>Shop by Category</h2>
+      <div class="category-links">
+        <a href="/fruit.html" class="category-link">
+          <h3>Fruit Pies</h3>
+          <p>Fresh, seasonal fruit pies</p>
+        </a>
+        <a href="/cheesecake.html" class="category-link">
+          <h3>Cheesecakes</h3>
+          <p>Rich, creamy cheesecakes</p>
+        </a>
+        <a href="/seasonal.html" class="category-link">
+          <h3>Seasonal</h3>
+          <p>Holiday favorites</p>
+        </a>
+      </div>
     </section>
 
     <aside id="cart" class="cart hidden">
@@ -92,6 +99,7 @@
   <!-- jQuery + Kendo UI from CDN -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://kendo.cdn.telerik.com/2024.3.1010/js/kendo.all.min.js"></script>
+  <script src="/cartStorage.js"></script>
   <script src="/app.js"></script>
 </body>
 
