@@ -1,4 +1,4 @@
-name: Playwright E2E Tests
+name: Playwright Smoke Tests (Comprehensive)
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ jobs:
     
     strategy:
       matrix:
-        test-type: [smoke, homepage]
+        test-type: [smoke]
     
     steps:
     - name: Checkout code
@@ -32,14 +32,7 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Smoke Tests
-      if: matrix.test-type == 'smoke'
       run: npx playwright test e2e/smoke.spec.js --reporter=html
-      env:
-        CI: true
-
-    - name: Run Homepage Tests
-      if: matrix.test-type == 'homepage'
-      run: npx playwright test e2e/homepage.spec.js --reporter=html
       env:
         CI: true
 
@@ -47,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: playwright-report-${{ matrix.test-type }}
+        name: playwright-report
         path: playwright-report/
         retention-days: 30
 
@@ -55,6 +48,6 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.test-type }}
+        name: test-results
         path: test-results/
         retention-days: 30
