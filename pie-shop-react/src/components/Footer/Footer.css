@@ -1,0 +1,12 @@
+/* Footer Component Styles - matching original */
+.footer {
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+.footer-content p {
+  margin: 0.5rem 0;
+}
