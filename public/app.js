@@ -60,63 +60,182 @@ function renderMonthly(pies) {
   pies.forEach(pie => container.appendChild(createPieCard(pie)));
 }
 
-// Simple cart implementation persisted in localStorage
-function getCart() {
-  try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch { return []; }
-}
-
-function saveCart(items) {
-  localStorage.setItem('cart', JSON.stringify(items));
-  updateCartUI();
-}
-
+// Cart functionality using cartStorage module
 function addToCart(pie) {
-  const items = getCart();
-  const existing = items.find(i => i.id === pie.id);
-  if (existing) existing.quantity += 1; else items.push({ ...pie, quantity: 1 });
-  saveCart(items);
+  const success = window.cartStorage?.addToCart(pie);
+  if (success) {
+    updateCartUI();
+  }
 }
 
 function removeFromCart(id) {
-  const items = getCart().filter(i => i.id !== id);
-  saveCart(items);
+  const success = window.cartStorage?.removeFromCart(id);
+  if (success) {
+    updateCartUI();
+  }
 }
 
 function clearCart() {
-  saveCart([]);
+  const success = window.cartStorage?.clearCart();
+  if (success) {
+    updateCartUI();
+  }
 }
 
-function updateCartUI() {
-  const items = getCart();
-  const count = items.reduce((s, i) => s + i.quantity, 0);
+/**
+ * Updates the cart count display in the header
+ * @param {number} count - Total number of items in cart
+ */
+function updateCartCount(count) {
   document.getElementById('cart-count').textContent = count;
+}
 
-  const el = document.getElementById('cart-items');
-  el.innerHTML = '';
+/**
+ * Creates a cart item row element
+ * @param {Object} item - Cart item with id, name, price, and quantity
+ * @returns {HTMLElement} Cart row element
+ */
+function createCartItemRow(item) {
+  const row = document.createElement('div');
+  row.className = 'cart-row';
+
+  const itemTotal = (item.price * item.quantity).toFixed(2);
+  row.innerHTML = `
+    <div class="cart-row-left">
+      <strong>${item.name}</strong> x ${item.quantity}
+    </div>
+    <div class="cart-row-right">
+      $${itemTotal} 
+      <button class="cart-remove" data-id="${item.id}">Remove</button>
+    </div>
+  `;
+
+  return row;
+}
+
+/**
+ * Renders all cart items in the cart container
+ * @param {Array} items - Array of cart items
+ * @returns {number} Total price of all items
+ */
+function renderCartItems(items) {
+  const cartContainer = document.getElementById('cart-items');
+  cartContainer.innerHTML = '';
+
   let total = 0;
+
   items.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'cart-row';
-    row.innerHTML = `<div class="cart-row-left"><strong>${item.name}</strong> x ${item.quantity}</div><div class="cart-row-right">$${(item.price * item.quantity).toFixed(2)} <button class="cart-remove" data-id="${item.id}">Remove</button></div>`;
-    el.appendChild(row);
+    const row = createCartItemRow(item);
+    cartContainer.appendChild(row);
     total += item.price * item.quantity;
   });
-  document.getElementById('cart-total').textContent = total.toFixed(2);
 
-  // wire remove buttons
-  el.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', e => {
-    removeFromCart(e.currentTarget.dataset.id);
-  }));
+  return total;
 }
 
-// Filters
+/**
+ * Updates the cart total display
+ * @param {number} total - Total price to display
+ */
+function updateCartTotal(total) {
+  document.getElementById('cart-total').textContent = total.toFixed(2);
+}
+
+/**
+ * Attaches event listeners to all remove buttons in the cart
+ */
+function attachRemoveButtonListeners() {
+  const cartContainer = document.getElementById('cart-items');
+  cartContainer.querySelectorAll('.cart-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      removeFromCart(e.currentTarget.dataset.id);
+    });
+  });
+}
+
+/**
+ * Updates the entire cart UI including count, items, total, and event listeners
+ */
+function updateCartUI() {
+  const items = window.cartStorage?.getCart() || [];
+
+  // Update cart count in header
+  const totalQuantity = window.cartStorage?.getCartQuantity() || 0;
+  updateCartCount(totalQuantity);
+
+  // Render cart items and calculate total
+  const totalPrice = renderCartItems(items);
+  updateCartTotal(totalPrice);
+
+  // Attach event listeners to remove buttons
+  attachRemoveButtonListeners();
+}
+
+/**
+ * Safely gets search input value with fallback
+ * @returns {string} Trimmed search query in lowercase
+ */
+function getSearchQuery() {
+  const searchElement = document.getElementById('search');
+  return searchElement?.value?.trim()?.toLowerCase() || '';
+}
+
+/**
+ * Safely gets category filter value with fallback
+ * @returns {string} Category value in lowercase
+ */
+function getCategoryFilter() {
+  const categoryElement = document.getElementById('categoryFilter');
+  return categoryElement?.value?.trim()?.toLowerCase() || '';
+}
+
+/**
+ * Checks if a pie matches the search query
+ * @param {Object} pie - Pie object with name and description
+ * @param {string} query - Search query in lowercase
+ * @returns {boolean} True if pie matches search criteria
+ */
+function matchesSearchQuery(pie, query) {
+  if (!query) return true;
+
+  const name = pie.name?.toLowerCase() || '';
+  const description = pie.description?.toLowerCase() || '';
+
+  return name.includes(query) || description.includes(query);
+}
+
+/**
+ * Checks if a pie matches the category filter
+ * @param {Object} pie - Pie object with category
+ * @param {string} categoryFilter - Category filter in lowercase
+ * @returns {boolean} True if pie matches category criteria
+ */
+function matchesCategoryFilter(pie, categoryFilter) {
+  if (!categoryFilter) return true;
+
+  const pieCategory = pie.category?.toLowerCase() || '';
+  return pieCategory === categoryFilter;
+}
+
+/**
+ * Applies search and category filters to pies array
+ * @param {Array} pies - Array of pie objects to filter
+ * @returns {Array} Filtered array of pies
+ */
 function applyFilters(pies) {
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  const category = (document.getElementById('categoryFilter').value || '').toLowerCase();
-  return pies.filter(p => {
-    const matchesQ = !q || p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
-    const matchesCategory = !category || p.category === category;
-    return matchesQ && matchesCategory;
+  // Validate input
+  if (!Array.isArray(pies)) {
+    console.warn('applyFilters: Invalid pies array provided');
+    return [];
+  }
+
+  const searchQuery = getSearchQuery();
+  const categoryFilter = getCategoryFilter();
+
+  return pies.filter(pie => {
+    const matchesSearch = matchesSearchQuery(pie, searchQuery);
+    const matchesCategory = matchesCategoryFilter(pie, categoryFilter);
+    return matchesSearch && matchesCategory;
   });
 }
 
@@ -151,31 +270,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCarousel();
     updateCartUI();
 
-    const pies = await fetchPies();
-    renderPies(pies);
-
+    // Load only monthly pies for home page
     const monthly = await fetchMonthly();
     renderMonthly(monthly);
 
-    // wire up filters
-    document.getElementById('search').addEventListener('input', () => renderPies(applyFilters(pies)));
-    document.getElementById('categoryFilter').addEventListener('change', async (e) => {
-      const cat = e.target.value.toLowerCase();
-      const filtered = await fetchPies(cat || undefined);
-      renderPies(filtered);
-    });
-
     // cart toggle
-    document.getElementById('cart-toggle').addEventListener('click', () => document.getElementById('cart').classList.toggle('hidden'));
-    document.getElementById('cart-clear').addEventListener('click', clearCart);
-
-    // optional: initialize Kendo widgets if available
-    if (window.kendo && window.$) {
-      $('#categoryFilter').kendoDropDownList();
-      $('#search').kendoTextBox?.();
-    }
+    document.getElementById('cart-toggle')?.addEventListener('click', () => {
+      document.getElementById('cart')?.classList.toggle('hidden');
+    });
+    document.getElementById('cart-clear')?.addEventListener('click', clearCart);
   } catch (err) {
-    console.error(err);
-    document.getElementById('pies').textContent = 'Failed to load pies.';
+    console.error('Failed to load home page:', err);
+    const container = document.getElementById('monthly');
+    if (container) {
+      container.textContent = 'Failed to load pies of the month.';
+    }
   }
 });

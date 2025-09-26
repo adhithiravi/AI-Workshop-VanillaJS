@@ -1,0 +1,96 @@
+/* Hero Component Styles - matching original */
+.hero {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.hero-slides {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
+  display: flex;
+  align-items: center;
+}
+
+.hero-slide.active {
+  opacity: 1;
+}
+
+.hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: absolute;
+  left: 2rem;
+  z-index: 10;
+  color: #fff;
+}
+
+.hero-content h2 {
+  font-size: 2.5rem;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.hero-indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hero-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #888;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.hero-indicator:hover {
+  background: #ccc;
+}
+
+.hero-indicator.active {
+  background: #fff;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .hero {
+    height: 400px;
+  }
+  
+  .hero-content h2 {
+    font-size: 2rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+  
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}

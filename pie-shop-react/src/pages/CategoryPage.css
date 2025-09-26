@@ -1,0 +1,46 @@
+/* CategoryPage Component Styles - matching original */
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.page-header h1 {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.search-section {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.pies-section {
+  margin: 2rem 0;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-results h3 {
+  margin: 0 0 1rem 0;
+  color: #666;
+  font-size: 1.5rem;
+}
+
+.no-results p {
+  margin: 0;
+  color: #999;
+}
