@@ -311,10 +311,6 @@ components:
 tags:
   - name: Pies
     description: Operations related to pie inventory and management
-  - name: Categories
-    description: Operations related to pie categories
-  - name: Search
-    description: Search and filtering operations
 
 externalDocs:
   description: Find out more about Bethany's Pie Shop
